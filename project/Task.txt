@@ -1,0 +1,66 @@
+Midsummer Graduate Software Developer Exercise
+
+Heat pump sizing
+Sizing a heat pump correctly requires a calculation of the rate of heat loss from a property at different inside and outside temperatures. By applying a temperature profile of a typical year's outdoor temperatures at the property location you can work out how often the heating capacity of a particular heat pump will be exceeded, and how much energy it would be expected to use to provide heating over the course of a year.
+
+
+Buildings get some incidental heating from occupants, appliance use, and from solar gain. So for a desired indoor temperature there is a lower 'base' outdoor temperature at which no heating will be required because the incidental heating provides sufficient heat input to the property. For example, for a house that is to be heated to 20 degrees C, the heating will typically not turn on until the outside temperature is below, perhaps, 14 degrees. When the outside temperature is below the base temperature, the heating power required for the building can be calculated from the difference between the actual outdoor temperature and the base temperature, the area of the outside surfaces of the building, and the thermal conductivity (U-values) of the materials from which the building is made.
+
+
+There is a free API which will return meteorological data, including outdoor temperatures, at hourly resolution for a year for a given location:
+https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/getting-started-pvgis/api-non-interactive-service_en
+
+
+We should be able to use this data to estimate the size of a heat pump needed to heat a building, the total heat input needed over the course of a year, the electrical energy used, and the expected cost of running the heat pump. The electrical energy used by a heat pump is considerably less than the total heat output of the pump - it depends on the Coefficient of Performance (CoP) of the heat pump, which is typically around 3 or 4. Tables are published giving CoP's of heat pumps at different input temperatures (the temperature of the outside air) and output temperatures (the 'flow temperature' at which heated water leaves the heat pump).
+
+
+What we want:
+A simple html page with a form to capture the following input data*:
+Surface area for the walls of a house (in m2)
+U value for the walls
+Surface area for the roof of a house
+U value for the roof
+Surface area for the floor of a house
+U value for the floor.
+Latitude and longitude
+Heat pump flow temperature
+Heat pump maximum heat output
+Property base temperature.
+When the form is submitted, call a back end script that in turn calls the PVGIS API and returns hourly temperatures for the year. The back end script should be written in either python or node.js - your choice.
+Using the base temperature, and the U values and areas, calculate and display the total annual heat energy required to heat the building, and the electrical energy used by the heat pump.
+Work out the number of hours where the heating load exceeds the heat pump power output.
+Add a readme.md that describes what you have done and includes instructions for running the project (eg does a python or node server need to be started)
+* this is a bit simplified - there will also be losses from doors and windows, and from ventilation - but we'll keep it simple for now.
+
+
+... and now the real task
+Ah but now we come up with a problem. A year or so ago the above task would have been a good exercise to give a prospective developer. But we live in a new world now. We gave the task above verbatim to an AI coding assistant, which spat out a pretty decent solution in less than two minutes. There is a nice html form. It calls a back end script. The back end calls the PVGIS API and gets some hourly temperature values.  It applies a calculation, which looks believable. We didn't tell it where to get CoP values for a heat pump, but it has made up some sensible values to apply at different air temperatures and flow temperatures. It has produced a lovely README.md file that, frankly, does a better job of explaining what is going on than my own explanation above.
+
+
+There is little point in us testing you on whether you can write the code yourself. You'd likely feed it straight to your favourite AI coding tool anyway - and you probably should. We wouldn't want to pay a developer a few hours work for something that AI can do in minutes for a few pence. So we are providing, as a github repo, the code we generated as a starting point to this exercise. At this point no human has touched it - we have merely given the above prompt to an AI agent.
+
+
+But the AI output is only a decent starting point. A good developer should be able to do better and take it further. Just for starters, here are some things we would like to add:
+We'd like a bar chart showing the electrical energy used each month over the course of a year
+It would be good to be able to select a day of the year and to get another chart that plots the temperature data and the electrical energy used by the heat pump hour-by-hour.
+Error handling isn't very graceful (eg try a lat / long position in the sea). And maybe some input validation for sensible values on all the inputs would be nice.
+Your task
+Part 1). Download the repository, and make some improvements. Start with the three above. If you have time and if there are any other improvements that you think would be good, fire away.
+
+
+Part 2). Currently the page allows you to put in a heat pump size, and it returns the number of hours a year in which this is exceeded by the heating load of the house. The calculator would be more useful if it recommended a minimum heat pump size that meant that a given threshold of hours (24 might be a sensible default value here, although it would be nice to be able to set the threshold in the form) is not exceeded. Implement a means of doing this.
+
+
+Part 3). When the heat pump specified isn't powerful enough to supply the required heating load it is going to get cold in the building. But how cold? Are there any missing bits of information we need to be able to work this out? Can you get the page to show graphs of the expected temperature in the house over the course of any given day if you use a heat pump that is undersized?
+
+
+Please aim to spend around 3 or 4 hours in total on this task. Please commit your work regularly, and as a minimum after you have finished working on each part. The task is deliberately rather open ended, there is a lot to get through, and it is stretching. Do what you can - we don't expect perfection. For part 3, you may not have time to produce fully working code (although it's great if you do). But it would still be useful to have notes on how you would approach the problem.
+
+
+You are very welcome to use AI coding assistants or chat agents and in fact we suspect it would be extremely hard to get through the above in an afternoon or evening without an AI helper. We would however like you to give us a brief description of any AI tools that you use, and we would like you to provide transcripts of any chats with AI agents. And whether or not you use AI, we will expect you to understand the code that you submit and be able to explain how it works.
+
+
+Thank you and good luck.
+
+
+
