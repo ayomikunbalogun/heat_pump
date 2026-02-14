@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heat Pump Sizing Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input {
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .result-value {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .error {
+            display: none;
+            padding: 15px;
+            background: #fee;
+            border-left: 4px solid #f44;
+            border-radius: 4px;
+            color: #c33;
+            margin-top: 20px;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Heat Pump Sizing Calculator</h1>
+            <p>Calculate annual heating requirements and heat pump performance</p>
+        </div>
+
+        <div class="form-container">
+            <form id="heatPumpForm">
+                <div class="form-section">
+                    <h2>Building Envelope - Walls</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="wallArea">Surface Area (m²)</label>
+                            <input type="number" id="wallArea" name="wallArea" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="wallU">U-Value (W/m²K)</label>
+                            <input type="number" id="wallU" name="wallU" step="0.01" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Building Envelope - Roof</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="roofArea">Surface Area (m²)</label>
+                            <input type="number" id="roofArea" name="roofArea" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="roofU">U-Value (W/m²K)</label>
+                            <input type="number" id="roofU" name="roofU" step="0.01" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Building Envelope - Floor</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="floorArea">Surface Area (m²)</label>
+                            <input type="number" id="floorArea" name="floorArea" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="floorU">U-Value (W/m²K)</label>
+                            <input type="number" id="floorU" name="floorU" step="0.01" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Location</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="latitude">Latitude</label>
+                            <input type="number" id="latitude" name="latitude" step="0.0001" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="longitude">Longitude</label>
+                            <input type="number" id="longitude" name="longitude" step="0.0001" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Heat Pump Specifications</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="flowTemp">Flow Temperature (°C)</label>
+                            <input type="number" id="flowTemp" name="flowTemp" step="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxOutput">Maximum Heat Output (kW)</label>
+                            <input type="number" id="maxOutput" name="maxOutput" step="0.1" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Property Settings</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="baseTemp">Base Temperature (°C)</label>
+                            <input type="number" id="baseTemp" name="baseTemp" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="indoorTemp">Indoor Temperature (°C)</label>
+                            <input type="number" id="indoorTemp" name="indoorTemp" step="0.1" value="20" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Calculate Heat Requirements</button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Fetching weather data and calculating...</p>
+            </div>
+
+            <div class="error" id="error"></div>
+
+            <div class="results" id="results">
+                <h2>📊 Results</h2>
+                <div class="result-item">
+                    <span class="result-label">Total Annual Heat Energy Required:</span>
+                    <span class="result-value" id="totalHeat">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Electrical Energy Used by Heat Pump:</span>
+                    <span class="result-value" id="electricalEnergy">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Average Coefficient of Performance (CoP):</span>
+                    <span class="result-value" id="avgCop">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Hours Exceeding Heat Pump Capacity:</span>
+                    <span class="result-value" id="exceedingHours">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Peak Heat Load:</span>
+                    <span class="result-value" id="peakLoad">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('heatPumpForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            Object.keys(data).forEach(key => {
+                data[key] = parseFloat(data[key]);
+            });
+
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('error').classList.remove('show');
+            document.getElementById('loading').classList.add('show');
+
+            try {
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Calculation failed');
+                }
+
+                document.getElementById('totalHeat').textContent = 
+                    `${result.totalHeatEnergy.toFixed(2)} kWh`;
+                document.getElementById('electricalEnergy').textContent = 
+                    `${result.electricalEnergy.toFixed(2)} kWh`;
+                document.getElementById('avgCop').textContent = 
+                    result.averageCoP.toFixed(2);
+                document.getElementById('exceedingHours').textContent = 
+                    `${result.hoursExceedingCapacity} hours`;
+                document.getElementById('peakLoad').textContent = 
+                    `${result.peakHeatLoad.toFixed(2)} kW`;
+
+                document.getElementById('results').classList.add('show');
+            } catch (error) {
+                document.getElementById('error').textContent = error.message;
+                document.getElementById('error').classList.add('show');
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
